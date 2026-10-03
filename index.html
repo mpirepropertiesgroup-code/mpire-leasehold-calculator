@@ -1,35 +1,164 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MPIRE Leasehold Extension Premium Estimator</title>
-<style>body{font-family:Arial;margin:0;background:#f3f4f6;color:#111}.wrap{max-width:850px;margin:auto;padding:22px}.card{background:white;padding:22px;border-radius:16px;margin-bottom:16px;box-shadow:0 5px 22px #0001}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}label{font-weight:bold;display:block;margin:12px 0 6px}select,input,button{width:100%;padding:13px;border-radius:9px;border:1px solid #ccc;font-size:16px;box-sizing:border-box}button{margin-top:18px;background:#111;color:#fff;font-weight:bold}.result{margin-top:18px;padding:18px;background:#f7f7f7;border-radius:12px}.amount{font-size:32px;font-weight:bold;margin:8px 0}.warn{margin-top:12px;padding:12px;background:#fff5d6;border-left:4px solid #d99b00;line-height:1.5}.note{color:#666;line-height:1.55;font-size:13px}@media(max-width:600px){.grid{grid-template-columns:1fr}}</style></head>
-<body><div class="wrap"><div class="card"><h1>MPIRE Leasehold Extension Premium Estimator</h1><p>Malaysia • Indicative leasehold extension estimate</p>
-<div class="grid"><div><label>State / Wilayah</label><select id="s"></select></div><div><label>Property Category</label><select id="c"><option>Residential</option><option>Commercial</option><option>Industrial</option><option>Agriculture</option><option>Others / Special</option></select></div></div>
-<div class="grid"><div><label>Current Remaining Lease (years)</label><input id="r" type="number" placeholder="e.g. 30"></div><div><label>Target Lease (years)</label><input id="t" type="number" value="99"></div></div>
-<div class="grid"><div><label>Land Area</label><input id="a" type="number" placeholder="e.g. 2000"></div><div><label>Area Unit</label><select id="u"><option value="sqft">sq ft</option><option value="acre">acre</option><option value="hectare">hectare</option></select></div></div>
-<label>Land Market Value (RM / sq ft)</label><input id="v" type="number" placeholder="e.g. 200">
-<button onclick="calc()">CALCULATE ESTIMATE</button><div id="o" class="result" style="display:none"></div></div>
-<div class="card"><b>Disclaimer</b><p class="note">This is an indicative estimator for preliminary advisory purposes only. It is not an official premium assessment or quotation. Final premium is subject to applicable law, current State policy, valuation, title conditions and approval by the relevant authority.</p></div></div>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MPIRE Leasehold Extension Premium Estimator</title>
+<style>
+*{box-sizing:border-box}body{font-family:Arial,sans-serif;margin:0;background:#f3f4f6;color:#111}
+.wrap{max-width:920px;margin:auto;padding:22px}.card{background:#fff;padding:24px;border-radius:18px;margin-bottom:16px;box-shadow:0 6px 25px #0001}
+h1{margin:0 0 7px;font-size:30px}.sub{color:#666;margin-bottom:22px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{font-weight:700;display:block;margin:13px 0 6px}select,input,button{width:100%;padding:13px;border-radius:10px;border:1px solid #ccc;font-size:16px}
+button{margin-top:20px;background:#111;color:#fff;font-weight:700;cursor:pointer}.result{margin-top:20px;padding:20px;background:#f7f7f7;border-radius:14px}
+.amount{font-size:34px;font-weight:800;margin:8px 0}.warn{margin-top:14px;padding:13px;background:#fff5d6;border-left:4px solid #d99b00;line-height:1.5}
+.info{margin-top:10px;padding:12px;background:#eef5ff;border-left:4px solid #3973d4;line-height:1.5}.note{color:#666;line-height:1.6;font-size:13px}
+.hidden{display:none!important}.tag{display:inline-block;padding:5px 9px;border-radius:20px;background:#e9e9e9;font-size:12px;font-weight:700}
+@media(max-width:650px){.grid{grid-template-columns:1fr}h1{font-size:25px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card">
+<h1>MPIRE Leasehold Extension Premium Estimator</h1>
+<div class="sub">Malaysia • Preliminary / indicative estimate</div>
+
+<div class="grid">
+<div><label>State / Wilayah</label><select id="state"></select></div>
+<div><label>Property Category</label>
+<select id="cat">
+<option>Residential</option><option>Commercial</option><option>Industrial</option><option>Agriculture</option><option>Others / Special</option>
+</select></div>
+</div>
+
+<div id="sarawakType" class="hidden">
+<label>Sarawak Residential Type</label>
+<select id="houseType"><option value="terrace">Terrace — RM1,000/unit</option><option value="semi">Semi-D — RM2,000/unit</option><option value="bungalow">Detached/Bungalow — RM3,000/unit</option></select>
+</div>
+
+<div id="flatZone" class="hidden">
+<label>Flat-rate zone</label>
+<select id="zone"></select>
+</div>
+
+<div class="grid">
+<div><label>Current Remaining Lease (years)</label><input id="remaining" type="number" min="0" step="0.01" placeholder="e.g. 54"></div>
+<div><label>Target Lease (years)</label><input id="target" type="number" min="1" step="0.01" value="99"></div>
+</div>
+
+<div class="grid">
+<div><label>Land Area</label><input id="area" type="number" min="0" step="0.01" placeholder="e.g. 3200"></div>
+<div><label>Area Unit</label><select id="unit"><option value="sqft">sq ft</option><option value="acre">acre</option><option value="hectare">hectare</option></select></div>
+</div>
+
+<div id="marketValueBox">
+<label>Land Market Value (RM / sq ft)</label>
+<input id="mv" type="number" min="0" step="0.01" placeholder="e.g. 270">
+</div>
+
+<div id="rateBox" class="hidden">
+<label>Applicable State Rate / Factor (%)</label>
+<input id="customRate" type="number" min="0" step="0.01" placeholder="Enter applicable rate">
+</div>
+
+<button onclick="calculate()">CALCULATE ESTIMATE</button>
+<div id="result" class="result" style="display:none"></div>
+</div>
+
+<div class="card">
+<b>Important disclaimer</b>
+<p class="note">This tool is an indicative estimator for preliminary property advisory purposes only. It is not an official premium assessment, valuation, approval or quotation by any State Authority, PTG, Land Office, JPPH, JTU or JTS. Final premium is subject to the applicable law, current policy, valuation, title conditions and approval of the relevant authority.</p>
+<p class="note"><b>Important:</b> Where a current official state/category rate has not been verified in this build, the calculator asks the user to enter the applicable rate rather than inventing one.</p>
+</div>
+</div>
+
 <script>
 const states=["Selangor","Johor","Kedah","Kelantan","Melaka","Negeri Sembilan","Pahang","Pulau Pinang","Perak","Perlis","Terengganu","Sabah","Sarawak","Kuala Lumpur"];
-const s=document.getElementById("s");states.forEach(x=>s.add(new Option(x,x)));
-const profiles={
-"Selangor":{Residential:[.25,100],Commercial:[.75,100],Industrial:[.75,100],Agriculture:[.10,100]},
-"Johor":{Residential:[.25,100],Commercial:[.75,100],Industrial:[.75,100],Agriculture:[.10,100]},
-"Melaka":{Residential:[.25,100],Commercial:[.75,100],Industrial:[.75,100],Agriculture:[.10,100]},
-"Negeri Sembilan":{Residential:[.25,100],Commercial:[.75,100],Industrial:[.75,100],Agriculture:[.10,100]},
-"Perak":{Residential:[.25,100],Commercial:[.75,100],Industrial:[.75,100],Agriculture:[.10,100]},
-"Pahang":{Residential:[.25,100],Commercial:[.75,100],Industrial:[.75,100],Agriculture:[.10,100]},
-"Terengganu":{Residential:[.25,100],Commercial:[.75,100],Industrial:[.75,100],Agriculture:[.10,100]},
-"Kelantan":{Residential:[.25,100],Commercial:[.75,100],Industrial:[.75,100],Agriculture:[.10,100]},
-"Kuala Lumpur":{Residential:[.25,99],Commercial:[.75,99],Industrial:[.75,99],Agriculture:[.10,99]},
-"Sabah":{Residential:[.10,100],Commercial:[.15,100],Industrial:[.40,100],Agriculture:[.30,100]},
-"Pulau Pinang":null,"Kedah":null,"Perlis":null,"Sarawak":null};
-function sqft(x,u){return u=="sqft"?x:u=="acre"?x*43560:x*107639.104}
-function calc(){
- let cat=document.getElementById("c").value,o=document.getElementById("o"),r=+document.getElementById("r").value,t=+document.getElementById("t").value,a=+document.getElementById("a").value,v=+document.getElementById("v").value;
- if(cat=="Others / Special"){o.style.display="block";o.innerHTML="<b>Special assessment required</b><p>Final premium depends on the relevant State Authority and applicable special conditions.</p>";return}
- let p=profiles[s.value]?.[cat];
- if(!p){o.style.display="block";o.innerHTML="<b>Official state/category rate required</b><p>This version does not invent a rate where a current official rate has not been verified.</p>";return}
- if(!(t>r&&a>0&&v>=0)){o.style.display="block";o.innerHTML="<b>Check your inputs.</b>";return}
- let years=t-r,area=sqft(a,document.getElementById("u").value),premium=p[0]*v*area*years/p[1];
- o.style.display="block";o.innerHTML="<div class='amount'>RM "+premium.toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2})+"</div><b>Additional years:</b> "+years.toFixed(2)+"<br><b>Formula:</b> "+(p[0]*100)+"% × land value × area × additional years ÷ "+p[1]+"<div class='warn'>Indicative only. Final premium is subject to the relevant State Authority and current official assessment.</div>";
+const s=document.getElementById("state"); states.forEach(x=>s.add(new Option(x,x)));
+
+const standard25=["Selangor","Johor","Melaka","Negeri Sembilan","Perak","Pahang","Terengganu","Kelantan"];
+const standard75=standard25;
+const standard10=standard25;
+
+function profile(state,cat){
+  if(standard25.includes(state)){
+    if(cat==="Residential") return {kind:"fraction",rate:.25,den:100,label:"25% / 100 framework"};
+    if(cat==="Commercial") return {kind:"fraction",rate:.75,den:100,label:"75% / 100 framework"};
+    if(cat==="Industrial") return {kind:"fraction",rate:.75,den:100,label:"75% / 100 framework"};
+    if(cat==="Agriculture") return {kind:"fraction",rate:.10,den:100,label:"10% / 100 framework"};
+  }
+  if(state==="Kuala Lumpur"){
+    if(cat==="Residential") return {kind:"fraction",rate:.25,den:99,label:"25% / 99 framework"};
+    if(cat==="Commercial"||cat==="Industrial") return {kind:"fraction",rate:.75,den:99,label:"75% / 99 framework"};
+    if(cat==="Agriculture") return {kind:"fraction",rate:.10,den:99,label:"10% / 99 framework"};
+  }
+  if(state==="Sabah"){
+    if(cat==="Residential") return {kind:"fraction",rate:.10,den:100,min:1000,label:"10% / 100 framework; RM1,000 minimum stated in working reference"};
+    if(cat==="Commercial") return {kind:"fraction",rate:.15,den:100,min:1000,label:"15% / 100 working reference; verify current applicable rate"};
+    if(cat==="Industrial") return {kind:"fraction",rate:.40,den:100,min:1000,label:"40% / 100 working reference; verify current applicable rate"};
+    if(cat==="Agriculture") return {kind:"fraction",rate:.30,den:100,min:1000,label:"30% / 100 framework; RM1,000 minimum stated in working reference"};
+  }
+  if(state==="Sarawak"){
+    if(cat==="Residential") return {kind:"sarawakResidential"};
+    if(cat==="Agriculture") return {kind:"sarawakAgriculture"};
+    if(cat==="Industrial") return {kind:"manualRate",label:"Sarawak industrial rate depends on applicable zone/category"};
+    if(cat==="Commercial") return {kind:"manualRate",label:"Sarawak commercial rate depends on applicable assessment/zoning"};
+  }
+  if(["Pulau Pinang","Kedah","Perlis"].includes(state)){
+    return {kind:"manualRate",label:"State/category-specific rate required; enter the applicable rate from the relevant current state instrument."};
+  }
+  return null;
 }
-</script></body></html>
+
+const cat=document.getElementById("cat");
+const sarawakType=document.getElementById("sarawakType");
+const flatZone=document.getElementById("flatZone");
+const zone=document.getElementById("zone");
+const rateBox=document.getElementById("rateBox");
+const marketValueBox=document.getElementById("marketValueBox");
+
+function updateFields(){
+  const p=profile(s.value,cat.value);
+  sarawakType.classList.toggle("hidden",!(s.value==="Sarawak"&&cat.value==="Residential"));
+  flatZone.classList.toggle("hidden",!(s.value==="Sarawak"&&cat.value==="Agriculture"));
+  rateBox.classList.toggle("hidden",!(p && p.kind==="manualRate"));
+  marketValueBox.classList.toggle("hidden",!!(p && (p.kind==="sarawakResidential"||p.kind==="sarawakAgriculture")));
+  zone.innerHTML="";
+  if(s.value==="Sarawak"&&cat.value==="Agriculture"){
+    [["town","Town — RM5,000/acre"],["suburban","Suburban — RM2,500/acre"],["countryLow","Country — RM200/acre"],["countryMid","Country — RM500/acre"],["countryHigh","Country — RM1,000/acre"]].forEach(x=>zone.add(new Option(x[1],x[0])));
+  }
+}
+s.addEventListener("change",updateFields);cat.addEventListener("change",updateFields);updateFields();
+
+function sqft(a,u){return u==="sqft"?a:u==="acre"?a*43560:a*107639.104}
+function money(n){return "RM "+n.toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2})}
+
+function calculate(){
+ const state=s.value, c=cat.value, p=profile(state,c), out=document.getElementById("result");
+ const remaining=+document.getElementById("remaining").value, target=+document.getElementById("target").value;
+ const area=+document.getElementById("area").value, unit=document.getElementById("unit").value, mv=+document.getElementById("mv").value;
+ if(c==="Others / Special"){out.style.display="block";out.innerHTML='<span class="tag">SPECIAL CATEGORY</span><div class="amount">Assessment Required</div><div class="note">No single standard automatic formula is used for this category. Final premium depends on the relevant State Authority and applicable special conditions.</div>';return;}
+ if(p.kind==="sarawakResidential"){
+   if(!(area>0)){out.style.display="block";out.innerHTML="<b>Enter land/lot quantity.</b>";return;}
+   const units=area; let rate={terrace:1000,semi:2000,bungalow:3000}[document.getElementById("houseType").value];
+   out.style.display="block";out.innerHTML='<span class="tag">SARAWAK FLAT-RATE MODEL</span><div class="amount">'+money(rate*units)+'</div><div class="note">Working reference: '+money(rate)+' per unit. Confirm current JTS conditions and the applicable unit basis before relying on the estimate.</div>';return;
+ }
+ if(p.kind==="sarawakAgriculture"){
+   if(!(area>0)){out.style.display="block";out.innerHTML="<b>Enter area.</b>";return;}
+   let rates={town:5000,suburban:2500,countryLow:200,countryMid:500,countryHigh:1000}; let acres=unit==="acre"?area:unit==="hectare"?area*2.47105381:area/43560;
+   let prem=rates[zone.value]*acres;
+   out.style.display="block";out.innerHTML='<span class="tag">SARAWAK FLAT-RATE MODEL</span><div class="amount">'+money(prem)+'</div><div class="note">Working reference: '+money(rates[zone.value])+' per acre for the selected zone. Confirm current JTS conditions and rate before relying on the estimate.</div>';return;
+ }
+ if(p.kind==="manualRate"){
+   const rate=+document.getElementById("customRate").value;
+   if(!(target>remaining&&area>0&&rate>=0)){out.style.display="block";out.innerHTML="<b>Enter valid lease, area and applicable rate.</b>";return;}
+   const years=target-remaining, sqftArea=sqft(area,unit), premium=rate/100*mv*sqftArea*years/99;
+   out.style.display="block";out.innerHTML='<span class="tag">STATE-SPECIFIC RATE</span><div class="amount">'+money(premium)+'</div><b>Additional years:</b> '+years.toFixed(2)+'<br><b>Formula used:</b> '+rate+'% × land value × area × (additional years ÷ 99)<div class="warn">The rate was entered by the user. It must be verified against the applicable current official state instrument.</div>';return;
+ }
+ if(!p || !(target>remaining&&area>0&&mv>=0)){out.style.display="block";out.innerHTML="<b>Please check your inputs.</b>";return;}
+ const years=target-remaining, sqftArea=sqft(area,unit);
+ let premium=p.rate*mv*sqftArea*years/p.den; if(p.min&&premium<p.min) premium=p.min;
+ out.style.display="block";out.innerHTML='<span class="tag">INDICATIVE ESTIMATE</span><div class="amount">'+money(premium)+'</div><b>Additional years:</b> '+years.toFixed(2)+'<br><b>Land area:</b> '+sqftArea.toLocaleString("en-MY",{maximumFractionDigits:2})+' sq ft<br><b>Working formula:</b> '+(p.rate*100)+'% × land value × area × additional years ÷ '+p.den+'<div class="info">'+p.label+'</div><div class="warn">Indicative only. Final premium is subject to the relevant State Authority and current official assessment.</div>';
+}
+</script>
+</body>
+</html>
